@@ -21,6 +21,13 @@ from dsa.sorting       import bubble_sort, key_case_id, key_priority, key_filing
 app = Flask(__name__)
 app.secret_key = "courtflow-dsa-secret-2026"
 
+# Ensure DB is initialized on app startup (for serverless environments like Vercel)
+try:
+    db.init_db()
+except Exception:
+    pass
+
+
 
 # ==========================================================================
 # HELPER: build_structures()

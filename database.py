@@ -13,8 +13,19 @@ with a foreign key back to cases.
 
 import sqlite3
 import os
+import shutil
 
-DB_PATH = os.path.join(os.path.dirname(__file__), "court_cases.db")
+# On Vercel / serverless environment, use writable /tmp directory
+if os.environ.get("VERCEL"):
+    DB_PATH = "/tmp/court_cases.db"
+    source_db = os.path.join(os.path.dirname(__file__), "court_cases.db")
+    if not os.path.exists(DB_PATH) and os.path.exists(source_db):
+        try:
+            shutil.copy2(source_db, DB_PATH)
+        except Exception:
+            pass
+else:
+    DB_PATH = os.path.join(os.path.dirname(__file__), "court_cases.db")
 
 
 def get_db():
