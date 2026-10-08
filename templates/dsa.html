@@ -20,7 +20,8 @@
     {% for case in queue_list %}
     <div class="queue-item">
       <div class="queue-box {% if loop.first %}front{% endif %}">
-        {{ case.case_id }}<br><span style="font-size:0.62rem;color:var(--text-muted)">{{ case.priority }}</span>
+        {{ case.case_id }} · <span style="color:var(--gold)">{{ case.courtroom_no or 'Courtroom 1' }}</span><br>
+        <span style="font-size:0.62rem;color:var(--text-muted)">{{ case.priority }} · {{ case.plaintiff }}</span>
       </div>
       {% if not loop.last %}
       <div class="queue-arrow">→</div>
@@ -51,7 +52,7 @@
     {% for case in pq_list %}
     <div class="queue-item">
       <div class="queue-box {% if loop.first %}front{% endif %}">
-        {{ case.case_id }}<br>
+        {{ case.case_id }} · <span style="color:var(--gold)">{{ case.courtroom_no or 'Courtroom 1' }}</span><br>
         <span style="font-size:0.62rem">
           {% if case.priority == 'High' %}<span style="color:#f87171">▲ High</span>
           {% elif case.priority == 'Medium' %}<span style="color:#fbbf24">● Med</span>
@@ -85,7 +86,7 @@
   <div class="stack-vis">
     {% for case in stack_list %}
     <div class="stack-item">
-      <div class="stack-box {% if loop.first %}top{% endif %}">{{ case.case_id }} — {{ case.plaintiff }} vs {{ case.defendant }}</div>
+      <div class="stack-box {% if loop.first %}top{% endif %}">{{ case.case_id }} [{{ case.courtroom_no or 'Courtroom 1' }}] — {{ case.plaintiff }} vs {{ case.defendant }}</div>
       <span class="stack-label">{% if loop.first %}← TOP{% endif %}</span>
     </div>
     {% endfor %}

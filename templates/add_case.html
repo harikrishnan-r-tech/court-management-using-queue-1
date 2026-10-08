@@ -64,6 +64,12 @@
       </div>
 
       <div class="form-group">
+        <label for="courtroom_no">Courtroom No.</label>
+        <input type="text" id="courtroom_no" name="courtroom_no"
+               value="{{ form.get('courtroom_no','Courtroom 1') }}" placeholder="e.g. Courtroom 1">
+      </div>
+
+      <div class="form-group">
         <label for="judge">Judge</label>
         <input type="text" id="judge" name="judge"
                value="{{ form.get('judge','') }}" placeholder="e.g. Justice Mehta">

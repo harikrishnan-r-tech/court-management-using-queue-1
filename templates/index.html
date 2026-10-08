@@ -21,7 +21,8 @@
       <div class="hero-tile-label">📥 Queue Front</div>
       <div class="hero-tile-value gold">
         {% if queue_front %}
-          {{ queue_front.case_id }} — {{ queue_front.plaintiff }} vs {{ queue_front.defendant }}
+          {{ queue_front.case_id }} · {{ queue_front.courtroom_no or 'Courtroom 1' }}<br>
+          <span style="font-size:0.75rem;font-weight:normal;color:var(--text-secondary)">{{ queue_front.plaintiff }} vs {{ queue_front.defendant }}</span>
         {% else %}
           <span class="text-muted">Queue empty</span>
         {% endif %}
@@ -31,7 +32,8 @@
       <div class="hero-tile-label">▲ Top Priority</div>
       <div class="hero-tile-value blue">
         {% if top_priority %}
-          {{ top_priority.case_id }} — {{ top_priority.priority }} · {{ top_priority.plaintiff }} vs {{ top_priority.defendant }}
+          {{ top_priority.case_id }} ({{ top_priority.priority }}) · {{ top_priority.courtroom_no or 'Courtroom 1' }}<br>
+          <span style="font-size:0.75rem;font-weight:normal;color:var(--text-secondary)">{{ top_priority.plaintiff }} vs {{ top_priority.defendant }}</span>
         {% else %}
           <span class="text-muted">No pending cases</span>
         {% endif %}
@@ -41,7 +43,8 @@
       <div class="hero-tile-label">✔ Stack Top (Last Completed)</div>
       <div class="hero-tile-value">
         {% if stack_top %}
-          {{ stack_top.case_id }} — {{ stack_top.plaintiff }} vs {{ stack_top.defendant }}
+          {{ stack_top.case_id }} · {{ stack_top.courtroom_no or 'Courtroom 1' }}<br>
+          <span style="font-size:0.75rem;font-weight:normal;color:var(--text-secondary)">{{ stack_top.plaintiff }} vs {{ stack_top.defendant }}</span>
         {% else %}
           <span class="text-muted">No completed cases</span>
         {% endif %}

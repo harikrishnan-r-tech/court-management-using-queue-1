@@ -36,15 +36,15 @@ Flask, and SQLite.
 ---
 
 ## ✨ Features
-- **Dashboard** — Live stats, Queue front, Top priority case, Stack top
-- **Add Case** — Validated form with auto-enqueue and history logging
-- **All Cases** — Sortable table (Bubble Sort) with View/Edit/Delete/Complete
-- **Search** — Choose Linear, Binary, or Hash search method
-- **Hearing Queue** — FIFO queue with Enqueue/Dequeue/Peek operations
-- **Priority Cases** — Heap-based priority ordering (High > Medium > Low)
+- **Dashboard** — Live stats, Queue front, Top priority case, Stack top with Courtroom Number
+- **Add Case** — Validated form with Courtroom Number, auto-enqueue, and history logging
+- **All Cases** — Sortable table (Bubble Sort) with View/Edit/Delete/Complete and Courtroom column
+- **Search** — Multi-field search (Case ID, Plaintiff, Defendant, Courtroom) with Linear, Binary, or Hash method
+- **Hearing Queue** — FIFO queue with Enqueue/Dequeue/Peek operations & Courtroom indicators
+- **Priority Cases** — Heap-based priority ordering (High > Medium > Low) with Courtroom details
 - **Case History** — Linked list chain with Insert/Delete node operations
 - **Completed Cases** — LIFO stack of completed cases
-- **DSA Visualization** — ASCII-style diagrams of all structures
+- **DSA Visualization** — Diagrams of all structures with Courtroom information
 - Dark glassmorphism UI with gold/blue accent theme
 
 ---

@@ -73,7 +73,7 @@
     <thead>
       <tr>
         <th>Case ID</th><th>Plaintiff</th><th>Defendant</th>
-        <th>Type</th><th>Priority</th><th>Status</th><th>Hearing Date</th>
+        <th>Type</th><th>Priority</th><th>Courtroom</th><th>Status</th><th>Hearing Date</th>
       </tr>
     </thead>
     <tbody>
@@ -84,6 +84,7 @@
         <td>{{ case.defendant }}</td>
         <td>{{ case.case_type }}</td>
         <td>{{ priority_badge(case.priority) }}</td>
+        <td><span class="badge" style="background:rgba(212,166,52,0.12);color:var(--gold-light);border:1px solid rgba(212,166,52,0.25)">🏛 {{ case.courtroom_no or 'Courtroom 1' }}</span></td>
         <td>{% if case.status == 'Completed' %}<span class="badge badge-completed">✔ Completed</span>
             {% else %}<span class="badge badge-pending">⏳ Pending</span>{% endif %}</td>
         <td>{{ case.hearing_date or '—' }}</td>

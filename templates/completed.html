@@ -52,7 +52,7 @@
 <div class="table-wrap">
   <table aria-label="Completed cases stack">
     <thead>
-      <tr><th>Stack Order</th><th>Case ID</th><th>Plaintiff</th><th>Defendant</th><th>Type</th><th>Priority</th><th>Filing Date</th><th>Judge</th></tr>
+      <tr><th>Stack Order</th><th>Case ID</th><th>Plaintiff</th><th>Defendant</th><th>Type</th><th>Priority</th><th>Courtroom</th><th>Filing Date</th><th>Judge</th></tr>
     </thead>
     <tbody>
       {% for case in completed_list %}
@@ -63,6 +63,7 @@
         <td>{{ case.defendant }}</td>
         <td>{{ case.case_type }}</td>
         <td>{{ priority_badge(case.priority) }}</td>
+        <td><span class="badge" style="background:rgba(212,166,52,0.12);color:var(--gold-light);border:1px solid rgba(212,166,52,0.25)">🏛 {{ case.courtroom_no or 'Courtroom 1' }}</span></td>
         <td>{{ case.filing_date }}</td>
         <td>{{ case.judge or '—' }}</td>
       </tr>

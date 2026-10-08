@@ -47,19 +47,26 @@ def init_db():
     # --- cases table ---
     c.execute("""
         CREATE TABLE IF NOT EXISTS cases (
-            case_id     TEXT PRIMARY KEY,
-            plaintiff   TEXT NOT NULL,
-            defendant   TEXT NOT NULL,
-            case_type   TEXT NOT NULL,
-            description TEXT,
-            priority    TEXT NOT NULL DEFAULT 'Low',
-            filing_date TEXT NOT NULL,
-            hearing_date TEXT,
-            judge       TEXT,
-            lawyer      TEXT,
-            status      TEXT NOT NULL DEFAULT 'Pending'
+            case_id       TEXT PRIMARY KEY,
+            plaintiff     TEXT NOT NULL,
+            defendant     TEXT NOT NULL,
+            case_type     TEXT NOT NULL,
+            description   TEXT,
+            priority      TEXT NOT NULL DEFAULT 'Low',
+            filing_date   TEXT NOT NULL,
+            hearing_date  TEXT,
+            courtroom_no  TEXT DEFAULT 'Courtroom 1',
+            judge         TEXT,
+            lawyer        TEXT,
+            status        TEXT NOT NULL DEFAULT 'Pending'
         )
     """)
+
+    # Ensure courtroom_no column exists in existing DBs
+    try:
+        c.execute("ALTER TABLE cases ADD COLUMN courtroom_no TEXT DEFAULT 'Courtroom 1'")
+    except sqlite3.OperationalError:
+        pass
 
     # --- case_history table ---
     c.execute("""
@@ -86,20 +93,20 @@ def init_db():
 def _seed_data(conn):
     """Insert 8 sample cases and initial history entries."""
     cases = [
-        ("C001", "Rahul",   "Kumar",  "Civil",    "Dispute over land boundary in Sector 7",      "High",   "2025-01-10", "2026-02-14", "Justice Mehta",   "Adv. Sharma",  "Pending"),
-        ("C002", "Priya",   "Arun",   "Criminal", "Assault and battery case near MG Road",       "High",   "2025-01-15", "2026-02-20", "Justice Verma",   "Adv. Kapoor",  "Pending"),
-        ("C003", "Suresh",  "Ravi",   "Property", "Illegal construction dispute in Township",    "Medium", "2025-02-01", "2026-03-05", "Justice Nair",    "Adv. Pillai",  "Pending"),
-        ("C004", "Anitha",  "Meena",  "Family",   "Child custody and alimony settlement",        "Low",    "2025-02-10", "2026-03-18", "Justice Reddy",   "Adv. Rao",     "Pending"),
-        ("C005", "Karthik", "Sanjay", "Civil",    "Contract breach in supply chain agreement",   "Medium", "2025-03-01", "2026-04-02", "Justice Singh",   "Adv. Iyer",    "Pending"),
-        ("C006", "Divya",   "Raj",    "Property", "Property ownership fraud in South Block",     "High",   "2025-03-12", "2026-04-10", "Justice Joshi",   "Adv. Desai",   "Pending"),
-        ("C007", "Hari",    "Mohan",  "Family",   "Inheritance dispute after father's demise",   "Low",    "2025-04-05", "2026-05-01", "Justice Kumar",   "Adv. Menon",   "Pending"),
-        ("C008", "Arjun",   "Vijay",  "Criminal", "Financial fraud and embezzlement charges",    "Medium", "2025-04-20", "2026-05-15", "Justice Patel",   "Adv. Gupta",   "Pending"),
+        ("C001", "Rahul",   "Kumar",  "Civil",    "Dispute over land boundary in Sector 7",      "High",   "2025-01-10", "2026-02-14", "Courtroom 1", "Justice Mehta",   "Adv. Sharma",  "Pending"),
+        ("C002", "Priya",   "Arun",   "Criminal", "Assault and battery case near MG Road",       "High",   "2025-01-15", "2026-02-20", "Courtroom 3", "Justice Verma",   "Adv. Kapoor",  "Pending"),
+        ("C003", "Suresh",  "Ravi",   "Property", "Illegal construction dispute in Township",    "Medium", "2025-02-01", "2026-03-05", "Courtroom 2", "Justice Nair",    "Adv. Pillai",  "Pending"),
+        ("C004", "Anitha",  "Meena",  "Family",   "Child custody and alimony settlement",        "Low",    "2025-02-10", "2026-03-18", "Courtroom 4", "Justice Reddy",   "Adv. Rao",     "Pending"),
+        ("C005", "Karthik", "Sanjay", "Civil",    "Contract breach in supply chain agreement",   "Medium", "2025-03-01", "2026-04-02", "Courtroom 1", "Justice Singh",   "Adv. Iyer",    "Pending"),
+        ("C006", "Divya",   "Raj",    "Property", "Property ownership fraud in South Block",     "High",   "2025-03-12", "2026-04-10", "Courtroom 2", "Justice Joshi",   "Adv. Desai",   "Pending"),
+        ("C007", "Hari",    "Mohan",  "Family",   "Inheritance dispute after father's demise",   "Low",    "2025-04-05", "2026-05-01", "Courtroom 4", "Justice Kumar",   "Adv. Menon",   "Pending"),
+        ("C008", "Arjun",   "Vijay",  "Criminal", "Financial fraud and embezzlement charges",    "Medium", "2025-04-20", "2026-05-15", "Courtroom 3", "Justice Patel",   "Adv. Gupta",   "Pending"),
     ]
 
     conn.executemany("""
         INSERT INTO cases (case_id, plaintiff, defendant, case_type, description,
-                           priority, filing_date, hearing_date, judge, lawyer, status)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                           priority, filing_date, hearing_date, courtroom_no, judge, lawyer, status)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     """, cases)
 
     # Seed initial history for each case
@@ -148,9 +155,9 @@ def insert_case(data):
     conn = get_db()
     conn.execute("""
         INSERT INTO cases (case_id, plaintiff, defendant, case_type, description,
-                           priority, filing_date, hearing_date, judge, lawyer, status)
+                           priority, filing_date, hearing_date, courtroom_no, judge, lawyer, status)
         VALUES (:case_id, :plaintiff, :defendant, :case_type, :description,
-                :priority, :filing_date, :hearing_date, :judge, :lawyer, 'Pending')
+                :priority, :filing_date, :hearing_date, :courtroom_no, :judge, :lawyer, 'Pending')
     """, data)
     conn.commit()
     conn.close()
@@ -162,7 +169,7 @@ def update_case(data):
         UPDATE cases SET
             plaintiff=:plaintiff, defendant=:defendant, case_type=:case_type,
             description=:description, priority=:priority, filing_date=:filing_date,
-            hearing_date=:hearing_date, judge=:judge, lawyer=:lawyer, status=:status
+            hearing_date=:hearing_date, courtroom_no=:courtroom_no, judge=:judge, lawyer=:lawyer, status=:status
         WHERE case_id=:case_id
     """, data)
     conn.commit()

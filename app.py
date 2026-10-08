@@ -257,6 +257,10 @@ def search():
             results = linear_search(all_cases, query, field="case_id")
             if not results:   # try plaintiff too
                 results = linear_search(all_cases, query, field="plaintiff")
+            if not results:   # try defendant too
+                results = linear_search(all_cases, query, field="defendant")
+            if not results:   # try courtroom
+                results = linear_search(all_cases, query, field="courtroom_no")
             algo_used = "Linear Search — O(n): Scanned every case one by one."
 
         elif method == "binary":
