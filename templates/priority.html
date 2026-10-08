@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% block title %}Priority Cases{% endblock %}
+{% block page_title %}▲ Priority Cases (Heap){% endblock %}
+
+{% block content %}
+
+{% macro priority_badge(p) %}
+  {% if p == 'High' %}<span class="badge badge-high">▲ High</span>
+  {% elif p == 'Medium' %}<span class="badge badge-medium">● Medium</span>
+  {% else %}<span class="badge badge-low">▼ Low</span>{% endif %}
+{% endmacro %}
+
+{% if top %}
+<div class="card" style="border-color:rgba(212,166,52,0.4)">
+  <div class="card-title">🏆 Highest Priority Case</div>
+  <p style="font-size:1.1rem;font-weight:600;color:var(--gold-light)">
+    {{ top.case_id }} — {{ top.plaintiff }} vs {{ top.defendant }}
+  </p>
+  <p style="margin-top:6px">{{ priority_badge(top.priority) }}
+    <span class="text-muted" style="font-size:0.83rem;margin-left:8px">Filed: {{ top.filing_date }}</span>
+  </p>
+  <p style="margin-top:8px;font-size:0.83rem;color:var(--text-secondary)">{{ top.description or '' }}</p>
+</div>
+{% endif %}
+
+<div class="card">
+  <div class="card-title">Priority Queue — Heap Order <span class="dsa-complexity">Push/Pop O(log n)</span></div>
+  <p style="font-size:0.83rem;color:var(--text-muted);margin-bottom:16px">
+    Cases are ordered: <strong class="text-danger">▲ High</strong> → <strong class="text-gold">● Medium</strong> → <strong class="text-success">▼ Low</strong>.
+    Ties are broken by filing date (earlier = higher priority).
+    Implemented using Python's <code>heapq</code> module (min-heap).
+  </p>
+
+  {% if priority_list %}
+  <div class="table-wrap">
+    <table aria-label="Priority queue">
+      <thead>
+        <tr><th>Rank</th><th>Case ID</th><th>Plaintiff</th><th>Defendant</th><th>Type</th><th>Priority</th><th>Filing Date</th><th>Hearing Date</th><th>Judge</th></tr>
+      </thead>
+      <tbody>
+        {% for case in priority_list %}
+        <tr>
+          <td><span class="position-circle {% if loop.index == 1 %}pos-1{% endif %}">{{ loop.index }}</span></td>
+          <td><span class="case-id">{{ case.case_id }}</span></td>
+          <td>{{ case.plaintiff }}</td>
+          <td>{{ case.defendant }}</td>
+          <td>{{ case.case_type }}</td>
+          <td>{{ priority_badge(case.priority) }}</td>
+          <td>{{ case.filing_date }}</td>
+          <td>{{ case.hearing_date or '—' }}</td>
+          <td>{{ case.judge or '—' }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="empty-state"><div class="empty-icon">📭</div><p>No pending cases in the priority queue.</p></div>
+  {% endif %}
+</div>
+
+<p class="text-muted mt-8" style="font-size:0.75rem">
+  ⓘ Priority Queue implemented in <code>dsa/priority_queue.py</code> using Python's <code>heapq</code>.
+  Encoding: High=0, Medium=1, Low=2 in the min-heap.
+</p>
+{% endblock %}

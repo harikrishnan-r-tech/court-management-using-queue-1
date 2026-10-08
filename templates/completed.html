@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% block title %}Completed Cases{% endblock %}
+{% block page_title %}✔ Completed Cases (Stack){% endblock %}
+
+{% block content %}
+
+{% macro priority_badge(p) %}
+  {% if p == 'High' %}<span class="badge badge-high">▲ High</span>
+  {% elif p == 'Medium' %}<span class="badge badge-medium">● Medium</span>
+  {% else %}<span class="badge badge-low">▼ Low</span>{% endif %}
+{% endmacro %}
+
+<!-- Stack Top Highlight -->
+{% if stack_top %}
+<div class="card" style="border-color:rgba(22,163,74,0.4)">
+  <div class="card-title">🏆 Stack Top (Most Recently Completed)</div>
+  <p style="font-size:1.05rem;font-weight:600;color:#4ade80">
+    {{ stack_top.case_id }} — {{ stack_top.plaintiff }} vs {{ stack_top.defendant }}
+  </p>
+  <p style="margin-top:4px">{{ priority_badge(stack_top.priority) }}
+    <span class="text-muted" style="font-size:0.83rem;margin-left:8px">{{ stack_top.case_type }}</span>
+  </p>
+</div>
+{% endif %}
+
+<!-- Stack Visualization -->
+<div class="card">
+  <div class="card-title">Stack Visualization <span class="dsa-complexity">Push/Pop O(1)</span></div>
+  <p style="font-size:0.83rem;color:var(--text-muted);margin-bottom:14px">
+    LIFO order — most recently completed case is on <strong>top</strong>.
+    Cases are pushed when a hearing is held (Dequeue from Hearing Queue).
+  </p>
+  {% if completed_list %}
+  <div class="stack-vis" aria-label="Stack visualization">
+    {% for case in completed_list %}
+    <div class="stack-item">
+      <div class="stack-box {% if loop.first %}top{% endif %}">
+        {{ case.case_id }} — {{ case.plaintiff }} vs {{ case.defendant }}
+      </div>
+      <span class="stack-label">{% if loop.first %}← TOP{% else %}← {{ loop.index }}{% endif %}</span>
+    </div>
+    {% endfor %}
+    <div style="margin-left:10px;margin-top:4px;font-size:0.72rem;color:var(--text-muted);font-family:'JetBrains Mono',monospace">⊥ BOTTOM</div>
+  </div>
+  {% else %}
+  <div class="empty-state"><div class="empty-icon">📚</div><p>Stack is empty. No cases completed yet.</p></div>
+  {% endif %}
+</div>
+
+<!-- Completed Cases Table -->
+{% if completed_list %}
+<div class="table-wrap">
+  <table aria-label="Completed cases stack">
+    <thead>
+      <tr><th>Stack Order</th><th>Case ID</th><th>Plaintiff</th><th>Defendant</th><th>Type</th><th>Priority</th><th>Filing Date</th><th>Judge</th></tr>
+    </thead>
+    <tbody>
+      {% for case in completed_list %}
+      <tr>
+        <td><span class="position-circle {% if loop.index == 1 %}pos-1{% endif %}">{{ loop.index }}</span></td>
+        <td><span class="case-id">{{ case.case_id }}</span></td>
+        <td>{{ case.plaintiff }}</td>
+        <td>{{ case.defendant }}</td>
+        <td>{{ case.case_type }}</td>
+        <td>{{ priority_badge(case.priority) }}</td>
+        <td>{{ case.filing_date }}</td>
+        <td>{{ case.judge or '—' }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endif %}
+
+<p class="text-muted mt-16" style="font-size:0.75rem">
+  ⓘ Stack implemented in <code>dsa/stack.py</code>. Push O(1) · Pop O(1) · Peek O(1).
+</p>
+{% endblock %}

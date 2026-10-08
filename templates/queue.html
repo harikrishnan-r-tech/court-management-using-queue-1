@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+{% block title %}Hearing Queue{% endblock %}
+{% block page_title %}📥 Hearing Queue (FIFO){% endblock %}
+
+{% block content %}
+
+{% macro priority_badge(p) %}
+  {% if p == 'High' %}<span class="badge badge-high">▲ High</span>
+  {% elif p == 'Medium' %}<span class="badge badge-medium">● Medium</span>
+  {% else %}<span class="badge badge-low">▼ Low</span>{% endif %}
+{% endmacro %}
+
+<!-- Controls -->
+<div class="card">
+  <h2 class="card-title">Queue Operations</h2>
+  <p style="font-size:0.83rem;color:var(--text-muted);margin-bottom:16px">
+    Cases are enqueued automatically when filed (FIFO order by filing date).
+    <strong>Dequeue</strong> = next hearing held; the case is marked Completed and pushed onto the Stack.
+  </p>
+  <div class="btn-group">
+    <form method="POST">
+      <input type="hidden" name="action" value="dequeue">
+      <button type="submit" class="btn btn-primary confirm-action"
+              onclick="return confirm('Dequeue front case? It will be marked Completed.')">⏏ Dequeue (Hold Hearing)</button>
+    </form>
+    <form method="POST">
+      <input type="hidden" name="action" value="peek">
+      <button type="submit" class="btn btn-blue">👁 Peek Front</button>
+    </form>
+    <a href="{{ url_for('add_case') }}" class="btn btn-ghost">➕ Enqueue (Add Case)</a>
+  </div>
+
+  {% if message %}
+  <div class="algo-info" style="margin-top:16px">ℹ {{ message }}</div>
+  {% endif %}
+</div>
+
+<!-- Queue Visualization -->
+<div class="card">
+  <div class="card-title">Queue Visualization <span class="dsa-complexity">FRONT → … → REAR</span></div>
+  {% if queue_list %}
+  <div class="queue-vis" aria-label="Queue visualization">
+    <span style="font-size:0.72rem;color:var(--text-muted);margin-right:6px">FRONT</span>
+    {% for case in queue_list %}
+    <div class="queue-item">
+      <div class="queue-box {% if loop.first %}front{% endif %}">
+        <span>{{ case.case_id }}</span><br>
+        <span style="font-size:0.65rem;color:var(--text-muted)">{{ case.plaintiff }} vs {{ case.defendant }}</span>
+      </div>
+      {% if not loop.last %}
+      <div class="queue-arrow">→</div>
+      {% endif %}
+    </div>
+    {% endfor %}
+    <div class="queue-arrow">→</div>
+    <div class="queue-null">NULL</div>
+  </div>
+  <p class="text-muted" style="font-size:0.72rem;margin-top:8px">Queue size: {{ queue_size }}</p>
+  {% else %}
+  <div class="empty-state"><div class="empty-icon">📭</div><p>Queue is empty. All cases have been heard.</p></div>
+  {% endif %}
+</div>
+
+<!-- Queue Table -->
+{% if queue_list %}
+<div class="table-wrap">
+  <table aria-label="Hearing queue">
+    <thead>
+      <tr><th>Position</th><th>Case ID</th><th>Plaintiff</th><th>Defendant</th><th>Type</th><th>Priority</th><th>Filing Date</th><th>Hearing Date</th></tr>
+    </thead>
+    <tbody>
+      {% for case in queue_list %}
+      <tr>
+        <td><span class="position-circle {% if loop.index == 1 %}pos-1{% endif %}">{{ loop.index }}</span></td>
+        <td><span class="case-id">{{ case.case_id }}</span></td>
+        <td>{{ case.plaintiff }}</td>
+        <td>{{ case.defendant }}</td>
+        <td>{{ case.case_type }}</td>
+        <td>{{ priority_badge(case.priority) }}</td>
+        <td>{{ case.filing_date }}</td>
+        <td>{{ case.hearing_date or '—' }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endif %}
+
+<p class="text-muted mt-16" style="font-size:0.75rem">
+  ⓘ Queue implemented in <code>dsa/queue.py</code>. Enqueue O(1) · Dequeue O(n) (list pop(0)) · Peek O(1).
+</p>
+{% endblock %}

@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}COURTFLOW{% endblock %} — Justice. Organized.</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<div class="layout">
+
+  <!-- ===== SIDEBAR ===== -->
+  <aside class="sidebar" role="navigation" aria-label="Main navigation">
+    <div class="sidebar-brand">
+      <div class="sidebar-logo">
+        <span class="logo-icon" aria-hidden="true">⚖</span>
+        CourtFlow
+      </div>
+      <div class="sidebar-tagline">Justice. Organized.</div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <div class="nav-section-label">Main</div>
+      <a href="{{ url_for('index') }}" class="nav-link {% if request.endpoint == 'index' %}active{% endif %}">
+        <span class="nav-icon">🏛</span> Dashboard
+      </a>
+      <a href="{{ url_for('add_case') }}" class="nav-link {% if request.endpoint == 'add_case' %}active{% endif %}">
+        <span class="nav-icon">➕</span> Add Case
+      </a>
+      <a href="{{ url_for('cases') }}" class="nav-link {% if request.endpoint == 'cases' %}active{% endif %}">
+        <span class="nav-icon">📋</span> All Cases
+      </a>
+      <a href="{{ url_for('search') }}" class="nav-link {% if request.endpoint == 'search' %}active{% endif %}">
+        <span class="nav-icon">🔍</span> Search Case
+      </a>
+
+      <div class="nav-section-label" style="margin-top:12px">DSA Structures</div>
+      <a href="{{ url_for('hearing_queue') }}" class="nav-link {% if request.endpoint == 'hearing_queue' %}active{% endif %}">
+        <span class="nav-icon">📥</span> Hearing Queue
+      </a>
+      <a href="{{ url_for('priority_queue_view') }}" class="nav-link {% if request.endpoint == 'priority_queue_view' %}active{% endif %}">
+        <span class="nav-icon">▲</span> Priority Cases
+      </a>
+      <a href="{{ url_for('history') }}" class="nav-link {% if request.endpoint == 'history' %}active{% endif %}">
+        <span class="nav-icon">🔗</span> Case History
+      </a>
+      <a href="{{ url_for('completed') }}" class="nav-link {% if request.endpoint == 'completed' %}active{% endif %}">
+        <span class="nav-icon">✔</span> Completed Cases
+      </a>
+      <a href="{{ url_for('dsa_viz') }}" class="nav-link {% if request.endpoint == 'dsa_viz' %}active{% endif %}">
+        <span class="nav-icon">📊</span> DSA Diagrams
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      COURTFLOW v1.0 · Demo Prototype<br>
+      DSA College Project · 2026
+    </div>
+  </aside>
+
+  <!-- ===== MAIN ===== -->
+  <div class="main">
+    <div class="top-accent-line"></div>
+
+    <header class="main-header">
+      <h1>{% block page_title %}COURTFLOW{% endblock %}</h1>
+      <span class="header-date" id="headerDate"></span>
+    </header>
+
+    <main class="page-content" id="mainContent">
+      <!-- Flash messages -->
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          <ul class="flash-list" role="alert">
+            {% for category, message in messages %}
+              <li class="flash flash-{{ category }}">
+                {% if category == 'success' %}✔{% else %}⚠{% endif %}
+                {{ message }}
+              </li>
+            {% endfor %}
+          </ul>
+        {% endif %}
+      {% endwith %}
+
+      {% block content %}{% endblock %}
+    </main>
+
+    <footer class="footer">
+      <strong>COURTFLOW</strong> · Court Case Management using DSA · Justice. Organized. ·
+      Demo Prototype · © 2026 CourtFlow
+      <br><span style="font-size:0.65rem">Not affiliated with any court or government body. All data is fictional.</span>
+    </footer>
+  </div>
+
+</div>
+
+<script>
+  // Inject today's date into the header
+  document.getElementById('headerDate').textContent = new Date().toLocaleDateString('en-IN',
+    { weekday:'short', year:'numeric', month:'short', day:'numeric' });
+
+  // Confirm before delete/complete actions
+  document.querySelectorAll('.confirm-action').forEach(function(form) {
+    form.addEventListener('submit', function(e) {
+      var msg = this.dataset.confirm || 'Are you sure?';
+      if (!confirm(msg)) e.preventDefault();
+    });
+  });
+</script>
+</body>
+</html>

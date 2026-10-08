@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+{% block title %}Dashboard{% endblock %}
+{% block page_title %}🏛 Dashboard{% endblock %}
+
+{% block content %}
+
+{# Helper macros #}
+{% macro priority_badge(p) %}
+  {% if p == 'High' %}<span class="badge badge-high">▲ High</span>
+  {% elif p == 'Medium' %}<span class="badge badge-medium">● Medium</span>
+  {% else %}<span class="badge badge-low">▼ Low</span>{% endif %}
+{% endmacro %}
+
+<!-- HERO -->
+<section class="hero" aria-label="System Overview">
+  <h2 class="hero-title">COURTFLOW</h2>
+  <p class="hero-subtitle">Court Case Management System — Powered by Data Structures &amp; Algorithms</p>
+
+  <div class="hero-tiles">
+    <div class="hero-tile">
+      <div class="hero-tile-label">📥 Queue Front</div>
+      <div class="hero-tile-value gold">
+        {% if queue_front %}
+          {{ queue_front.case_id }} — {{ queue_front.plaintiff }} vs {{ queue_front.defendant }}
+        {% else %}
+          <span class="text-muted">Queue empty</span>
+        {% endif %}
+      </div>
+    </div>
+    <div class="hero-tile">
+      <div class="hero-tile-label">▲ Top Priority</div>
+      <div class="hero-tile-value blue">
+        {% if top_priority %}
+          {{ top_priority.case_id }} — {{ top_priority.priority }} · {{ top_priority.plaintiff }} vs {{ top_priority.defendant }}
+        {% else %}
+          <span class="text-muted">No pending cases</span>
+        {% endif %}
+      </div>
+    </div>
+    <div class="hero-tile">
+      <div class="hero-tile-label">✔ Stack Top (Last Completed)</div>
+      <div class="hero-tile-value">
+        {% if stack_top %}
+          {{ stack_top.case_id }} — {{ stack_top.plaintiff }} vs {{ stack_top.defendant }}
+        {% else %}
+          <span class="text-muted">No completed cases</span>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- STAT CARDS -->
+<div class="stat-grid" aria-label="Statistics">
+  <div class="stat-card">
+    <div class="stat-icon">📋</div>
+    <div class="stat-number">{{ stats.total }}</div>
+    <div class="stat-label">Total Cases</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon">⏳</div>
+    <div class="stat-number">{{ stats.pending }}</div>
+    <div class="stat-label">Pending</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon">✔</div>
+    <div class="stat-number">{{ stats.completed }}</div>
+    <div class="stat-label">Completed</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon">🔴</div>
+    <div class="stat-number">{{ stats.high_priority }}</div>
+    <div class="stat-label">High Priority</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon">📅</div>
+    <div class="stat-number">{{ stats.today_hearings }}</div>
+    <div class="stat-label">Today's Hearings</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon">📥</div>
+    <div class="stat-number">{{ queue_size }}</div>
+    <div class="stat-label">Waiting in Queue</div>
+  </div>
+</div>
+
+<!-- QUICK LINKS -->
+<h2 class="section-title">Quick Actions</h2>
+<div class="btn-group">
+  <a href="{{ url_for('add_case') }}" class="btn btn-primary">➕ Add New Case</a>
+  <a href="{{ url_for('hearing_queue') }}" class="btn btn-blue">📥 Hearing Queue</a>
+  <a href="{{ url_for('search') }}" class="btn btn-ghost">🔍 Search Case</a>
+  <a href="{{ url_for('dsa_viz') }}" class="btn btn-ghost">📊 DSA Diagrams</a>
+</div>
+
+{% endblock %}

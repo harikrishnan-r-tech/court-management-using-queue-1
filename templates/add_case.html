@@ -1,0 +1,113 @@
+{% extends "base.html" %}
+{% block title %}{% if edit %}Edit Case{% else %}Add Case{% endif %}{% endblock %}
+{% block page_title %}{% if edit %}✏ Edit Case {{ form.case_id }}{% else %}➕ Add New Case{% endif %}{% endblock %}
+
+{% block content %}
+<div class="card">
+  <h2 class="card-title">{% if edit %}Edit Case Details{% else %}File a New Case{% endif %}</h2>
+
+  <form method="POST" autocomplete="off">
+    <div class="form-grid">
+
+      <div class="form-group">
+        <label for="case_id">Case ID <span aria-label="required">*</span></label>
+        <input type="text" id="case_id" name="case_id"
+               value="{{ form.get('case_id','') }}"
+               placeholder="e.g. C009"
+               {% if edit %}readonly style="opacity:0.6"{% endif %}
+               required pattern="C\d{3}"
+               title="Format: C followed by 3 digits (e.g. C009)">
+      </div>
+
+      <div class="form-group">
+        <label for="plaintiff">Plaintiff <span aria-label="required">*</span></label>
+        <input type="text" id="plaintiff" name="plaintiff"
+               value="{{ form.get('plaintiff','') }}" placeholder="Full name" required>
+      </div>
+
+      <div class="form-group">
+        <label for="defendant">Defendant <span aria-label="required">*</span></label>
+        <input type="text" id="defendant" name="defendant"
+               value="{{ form.get('defendant','') }}" placeholder="Full name" required>
+      </div>
+
+      <div class="form-group">
+        <label for="case_type">Case Type <span aria-label="required">*</span></label>
+        <select id="case_type" name="case_type" required>
+          <option value="">-- Select Type --</option>
+          {% for ct in ['Civil','Criminal','Property','Family','Constitutional','Commercial'] %}
+            <option value="{{ ct }}" {% if form.get('case_type') == ct %}selected{% endif %}>{{ ct }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="priority">Priority <span aria-label="required">*</span></label>
+        <select id="priority" name="priority" required>
+          <option value="">-- Select Priority --</option>
+          <option value="High"   {% if form.get('priority') == 'High' %}selected{% endif %}>▲ High</option>
+          <option value="Medium" {% if form.get('priority') == 'Medium' %}selected{% endif %}>● Medium</option>
+          <option value="Low"    {% if form.get('priority') == 'Low' %}selected{% endif %}>▼ Low</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="filing_date">Filing Date <span aria-label="required">*</span></label>
+        <input type="date" id="filing_date" name="filing_date"
+               value="{{ form.get('filing_date','') }}" required>
+      </div>
+
+      <div class="form-group">
+        <label for="hearing_date">Hearing Date</label>
+        <input type="date" id="hearing_date" name="hearing_date"
+               value="{{ form.get('hearing_date','') }}">
+      </div>
+
+      <div class="form-group">
+        <label for="judge">Judge</label>
+        <input type="text" id="judge" name="judge"
+               value="{{ form.get('judge','') }}" placeholder="e.g. Justice Mehta">
+      </div>
+
+      <div class="form-group">
+        <label for="lawyer">Lawyer</label>
+        <input type="text" id="lawyer" name="lawyer"
+               value="{{ form.get('lawyer','') }}" placeholder="e.g. Adv. Sharma">
+      </div>
+
+      {% if edit %}
+      <div class="form-group">
+        <label for="status">Status</label>
+        <select id="status" name="status">
+          <option value="Pending"   {% if form.get('status') == 'Pending' %}selected{% endif %}>Pending</option>
+          <option value="Completed" {% if form.get('status') == 'Completed' %}selected{% endif %}>✔ Completed</option>
+        </select>
+      </div>
+      {% endif %}
+
+      <div class="form-group form-full">
+        <label for="description">Description</label>
+        <textarea id="description" name="description"
+                  placeholder="Brief case description">{{ form.get('description','') }}</textarea>
+      </div>
+
+    </div>
+
+    <div class="form-actions">
+      <button type="submit" class="btn btn-primary">
+        {% if edit %}💾 Save Changes{% else %}📥 File Case{% endif %}
+      </button>
+      <a href="{{ url_for('cases') }}" class="btn btn-ghost">✕ Cancel</a>
+    </div>
+  </form>
+</div>
+
+<div class="card" style="margin-top:12px">
+  <div class="card-title">ℹ Case ID Format</div>
+  <p style="font-size:0.85rem;color:var(--text-muted)">
+    Case ID must be <span class="mono text-gold">C</span> followed by exactly 3 digits.
+    Example: <span class="mono text-gold">C009</span>, <span class="mono text-gold">C010</span>.
+    Each Case ID must be unique.
+  </p>
+</div>
+{% endblock %}

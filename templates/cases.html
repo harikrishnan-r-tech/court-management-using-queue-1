@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+{% block title %}All Cases{% endblock %}
+{% block page_title %}📋 All Cases{% endblock %}
+
+{% block content %}
+
+{% macro priority_badge(p) %}
+  {% if p == 'High' %}<span class="badge badge-high">▲ High</span>
+  {% elif p == 'Medium' %}<span class="badge badge-medium">● Medium</span>
+  {% else %}<span class="badge badge-low">▼ Low</span>{% endif %}
+{% endmacro %}
+
+{% macro status_badge(s) %}
+  {% if s == 'Completed' %}<span class="badge badge-completed">✔ Completed</span>
+  {% else %}<span class="badge badge-pending">⏳ Pending</span>{% endif %}
+{% endmacro %}
+
+<!-- Sort Bar -->
+<div class="sort-bar" aria-label="Sort options">
+  <span>Sort by (Bubble Sort):</span>
+  <a href="{{ url_for('cases', sort='case_id', order='asc' if (sort_by!='case_id' or order=='desc') else 'desc') }}"
+     class="sort-btn {% if sort_by=='case_id' %}active{% endif %}">
+    Case ID {% if sort_by=='case_id' %}{{ '↑' if order=='asc' else '↓' }}{% endif %}
+  </a>
+  <a href="{{ url_for('cases', sort='priority', order='asc' if (sort_by!='priority' or order=='desc') else 'desc') }}"
+     class="sort-btn {% if sort_by=='priority' %}active{% endif %}">
+    Priority {% if sort_by=='priority' %}{{ '↑' if order=='asc' else '↓' }}{% endif %}
+  </a>
+  <a href="{{ url_for('cases', sort='filing_date', order='asc' if (sort_by!='filing_date' or order=='desc') else 'desc') }}"
+     class="sort-btn {% if sort_by=='filing_date' %}active{% endif %}">
+    Filing Date {% if sort_by=='filing_date' %}{{ '↑' if order=='asc' else '↓' }}{% endif %}
+  </a>
+  <a href="{{ url_for('add_case') }}" class="btn btn-primary btn-sm" style="margin-left:auto">➕ Add Case</a>
+</div>
+
+{% if cases %}
+<div class="table-wrap">
+  <table aria-label="All court cases">
+    <thead>
+      <tr>
+        <th>Case ID</th>
+        <th>Plaintiff</th>
+        <th>Defendant</th>
+        <th>Type</th>
+        <th>Priority</th>
+        <th>Filing Date</th>
+        <th>Hearing Date</th>
+        <th>Judge</th>
+        <th>Status</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for case in cases %}
+      <tr>
+        <td><span class="case-id">{{ case.case_id }}</span></td>
+        <td>{{ case.plaintiff }}</td>
+        <td>{{ case.defendant }}</td>
+        <td>{{ case.case_type }}</td>
+        <td>{{ priority_badge(case.priority) }}</td>
+        <td>{{ case.filing_date }}</td>
+        <td>{{ case.hearing_date or '—' }}</td>
+        <td>{{ case.judge or '—' }}</td>
+        <td>{{ status_badge(case.status) }}</td>
+        <td>
+          <div class="btn-group">
+            <a href="{{ url_for('edit_case', case_id=case.case_id) }}" class="btn btn-ghost btn-sm">✏</a>
+            {% if case.status == 'Pending' %}
+            <form method="POST" action="{{ url_for('complete_case', case_id=case.case_id) }}"
+                  class="confirm-action" data-confirm="Mark Case {{ case.case_id }} as Completed?">
+              <button type="submit" class="btn btn-success btn-sm">✔</button>
+            </form>
+            {% endif %}
+            <form method="POST" action="{{ url_for('delete_case', case_id=case.case_id) }}"
+                  class="confirm-action" data-confirm="Delete Case {{ case.case_id }}? This cannot be undone.">
+              <button type="submit" class="btn btn-danger btn-sm">🗑</button>
+            </form>
+          </div>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}
+<div class="empty-state">
+  <div class="empty-icon">📋</div>
+  <p>No cases found. <a href="{{ url_for('add_case') }}">Add the first case</a>.</p>
+</div>
+{% endif %}
+
+<p class="text-muted mt-16" style="font-size:0.75rem">
+  ⓘ Sorting uses <strong>Bubble Sort — O(n²)</strong> implemented in <code>dsa/sorting.py</code>.
+</p>
+{% endblock %}

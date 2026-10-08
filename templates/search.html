@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+{% block title %}Search Case{% endblock %}
+{% block page_title %}🔍 Search Case{% endblock %}
+
+{% block content %}
+
+{% macro priority_badge(p) %}
+  {% if p == 'High' %}<span class="badge badge-high">▲ High</span>
+  {% elif p == 'Medium' %}<span class="badge badge-medium">● Medium</span>
+  {% else %}<span class="badge badge-low">▼ Low</span>{% endif %}
+{% endmacro %}
+
+<div class="card">
+  <h2 class="card-title">Search by Case ID or Plaintiff Name</h2>
+
+  <form method="POST">
+    <div class="form-grid" style="grid-template-columns: 1fr auto">
+      <div class="form-group">
+        <label for="query">Search Query</label>
+        <input type="text" id="query" name="query"
+               value="{{ query }}" placeholder="e.g. C001 or Rahul" autofocus>
+      </div>
+      <div class="form-group" style="justify-content:flex-end;padding-top:22px">
+        <button type="submit" class="btn btn-primary">🔍 Search</button>
+      </div>
+    </div>
+
+    <!-- Search Method Pills -->
+    <div style="margin-top:12px">
+      <p style="font-size:0.78rem;color:var(--text-muted);margin-bottom:8px;font-weight:600">SEARCH ALGORITHM</p>
+      <div class="method-pills" role="group" aria-label="Search method">
+        <div class="method-pill">
+          <input type="radio" id="m_linear" name="method" value="linear" {% if method=='linear' %}checked{% endif %}>
+          <label for="m_linear">📋 Linear Search <span style="color:var(--text-muted)">O(n)</span></label>
+        </div>
+        <div class="method-pill">
+          <input type="radio" id="m_binary" name="method" value="binary" {% if method=='binary' %}checked{% endif %}>
+          <label for="m_binary">⚡ Binary Search <span style="color:var(--text-muted)">O(log n)</span></label>
+        </div>
+        <div class="method-pill">
+          <input type="radio" id="m_hash" name="method" value="hash" {% if method=='hash' %}checked{% endif %}>
+          <label for="m_hash">🔑 Hash Lookup <span style="color:var(--text-muted)">O(1)</span></label>
+        </div>
+      </div>
+    </div>
+  </form>
+
+  <div class="card" style="margin-top:12px;padding:12px 16px">
+    <table style="width:100%;font-size:0.78rem;border:none">
+      <tr><th style="text-align:left;padding:4px 8px;color:var(--text-muted)">Method</th><th style="text-align:left;padding:4px 8px;color:var(--text-muted)">How It Works</th><th style="text-align:left;padding:4px 8px;color:var(--text-muted)">Complexity</th><th style="text-align:left;padding:4px 8px;color:var(--text-muted)">Input</th></tr>
+      <tr><td style="padding:4px 8px">Linear</td><td style="padding:4px 8px;color:var(--text-secondary)">Scans every record one by one</td><td style="padding:4px 8px" class="mono text-blue">O(n)</td><td style="padding:4px 8px;color:var(--text-muted)">Any text</td></tr>
+      <tr><td style="padding:4px 8px">Binary</td><td style="padding:4px 8px;color:var(--text-secondary)">List sorted by ID, then halved each step</td><td style="padding:4px 8px" class="mono text-blue">O(log n)</td><td style="padding:4px 8px;color:var(--text-muted)">Exact Case ID</td></tr>
+      <tr><td style="padding:4px 8px">Hash</td><td style="padding:4px 8px;color:var(--text-secondary)">Direct key access via Python dict</td><td style="padding:4px 8px" class="mono text-blue">O(1) avg</td><td style="padding:4px 8px;color:var(--text-muted)">Exact Case ID</td></tr>
+    </table>
+  </div>
+</div>
+
+{% if algo_used %}
+<div class="algo-info">
+  <span>⚙</span> <strong>Algorithm used:</strong> {{ algo_used }}
+</div>
+{% endif %}
+
+{% if not_found %}
+<div class="empty-state">
+  <div class="empty-icon">🔍</div>
+  <p>No cases found matching <strong>"{{ query }}"</strong>.</p>
+</div>
+{% elif results %}
+<h2 class="section-title">Results ({{ results|length }})</h2>
+<div class="table-wrap">
+  <table aria-label="Search results">
+    <thead>
+      <tr>
+        <th>Case ID</th><th>Plaintiff</th><th>Defendant</th>
+        <th>Type</th><th>Priority</th><th>Status</th><th>Hearing Date</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for case in results %}
+      <tr>
+        <td><span class="case-id">{{ case.case_id }}</span></td>
+        <td>{{ case.plaintiff }}</td>
+        <td>{{ case.defendant }}</td>
+        <td>{{ case.case_type }}</td>
+        <td>{{ priority_badge(case.priority) }}</td>
+        <td>{% if case.status == 'Completed' %}<span class="badge badge-completed">✔ Completed</span>
+            {% else %}<span class="badge badge-pending">⏳ Pending</span>{% endif %}</td>
+        <td>{{ case.hearing_date or '—' }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endif %}
+
+{% endblock %}

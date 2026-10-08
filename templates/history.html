@@ -1,0 +1,115 @@
+{% extends "base.html" %}
+{% block title %}Case History{% endblock %}
+{% block page_title %}🔗 Case History (Linked List){% endblock %}
+
+{% block content %}
+
+<!-- Case Selector -->
+<div class="card">
+  <h2 class="card-title">Select Case</h2>
+  <div class="btn-group" style="flex-wrap:wrap">
+    {% for case in all_cases %}
+    <a href="{{ url_for('history', case_id=case.case_id) }}"
+       class="btn {% if case.case_id == selected_id %}btn-primary{% else %}btn-ghost{% endif %} btn-sm">
+      {{ case.case_id }}
+    </a>
+    {% endfor %}
+  </div>
+</div>
+
+{% if selected_case %}
+<!-- Case Info -->
+<div class="card">
+  <div class="card-title">
+    🔗 History Chain for {{ selected_case.case_id }} — {{ selected_case.plaintiff }} vs {{ selected_case.defendant }}
+  </div>
+
+  <!-- Linked List Visualization -->
+  {% if chain %}
+  <div class="ll-chain" aria-label="Linked list chain" role="list">
+    {% for entry in chain %}
+    <div role="listitem" class="ll-node">
+      <div class="ll-data">
+        <span style="font-weight:600">{{ entry.action }}</span>
+        <span style="color:var(--text-muted);font-size:0.68rem">{{ entry.action_date }}</span>
+        <span style="color:var(--text-secondary);font-size:0.68rem">{{ entry.note|truncate(40) }}</span>
+      </div>
+      <div class="ll-ptr">→</div>
+    </div>
+    <div class="ll-arrow">→</div>
+    {% endfor %}
+    <div class="ll-null">NULL</div>
+  </div>
+  <p class="text-muted" style="font-size:0.72rem;margin-top:8px">
+    {{ chain|length }} node(s) in this linked list.
+  </p>
+  {% else %}
+  <div class="empty-state"><div class="empty-icon">🔗</div><p>No history entries for this case.</p></div>
+  {% endif %}
+</div>
+
+<!-- History Table -->
+{% if chain %}
+<div class="table-wrap" style="margin-bottom:20px">
+  <table aria-label="Case history entries">
+    <thead>
+      <tr><th>#</th><th>Entry ID</th><th>Action</th><th>Date</th><th>Note</th><th>Delete Node</th></tr>
+    </thead>
+    <tbody>
+      {% for entry in chain %}
+      <tr>
+        <td class="mono text-muted">{{ loop.index }}</td>
+        <td class="mono text-gold">H{{ entry.entry_id }}</td>
+        <td>{{ entry.action }}</td>
+        <td>{{ entry.action_date }}</td>
+        <td style="font-size:0.80rem;color:var(--text-secondary)">{{ entry.note or '—' }}</td>
+        <td>
+          <form method="POST" class="confirm-action" data-confirm="Delete history node H{{ entry.entry_id }}?">
+            <input type="hidden" name="action" value="delete">
+            <input type="hidden" name="entry_id" value="{{ entry.entry_id }}">
+            <input type="hidden" name="entry_case_id" value="{{ selected_id }}">
+            <button type="submit" class="btn btn-danger btn-sm">🗑 Delete Node</button>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endif %}
+
+<!-- Insert Node Form -->
+<div class="card">
+  <h2 class="card-title">➕ Insert New History Node</h2>
+  <form method="POST">
+    <input type="hidden" name="action" value="insert">
+    <div class="form-grid">
+      <div class="form-group">
+        <label for="h_case_id">Case ID</label>
+        <input type="text" id="h_case_id" name="case_id" value="{{ selected_id }}" readonly style="opacity:0.7">
+      </div>
+      <div class="form-group">
+        <label for="h_action">Action <span aria-label="required">*</span></label>
+        <input type="text" id="h_action" name="action_text" placeholder="e.g. Bail Granted" required>
+      </div>
+      <div class="form-group">
+        <label for="h_date">Date</label>
+        <input type="date" id="h_date" name="action_date" value="{{ '' }}">
+      </div>
+      <div class="form-group form-full">
+        <label for="h_note">Note</label>
+        <textarea id="h_note" name="note" placeholder="Optional note about this action"></textarea>
+      </div>
+    </div>
+    <div class="form-actions">
+      <button type="submit" class="btn btn-primary">➕ Insert Node</button>
+    </div>
+  </form>
+</div>
+{% endif %}
+
+<p class="text-muted mt-8" style="font-size:0.75rem">
+  ⓘ History chains are Linked Lists implemented in <code>dsa/linked_list.py</code>.
+  Insert at tail O(n) · Delete by entry_id O(n) · Display O(n).
+</p>
+{% endblock %}

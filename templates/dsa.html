@@ -1,0 +1,202 @@
+{% extends "base.html" %}
+{% block title %}DSA Diagrams{% endblock %}
+{% block page_title %}📊 DSA Visualization{% endblock %}
+
+{% block content %}
+
+<!-- 1. QUEUE -->
+<div class="dsa-panel">
+  <div class="dsa-panel-title">
+    📥 1. Queue — FIFO (First-In, First-Out)
+    <span class="dsa-complexity">Enqueue O(1) · Dequeue O(n) · Peek O(1)</span>
+  </div>
+  <p style="font-size:0.78rem;color:var(--text-muted);margin-bottom:12px">
+    Cases join at the REAR and leave from the FRONT. Models a real court hearing line.
+    Implemented in <code>dsa/queue.py</code> using a Python list.
+  </p>
+  {% if queue_list %}
+  <div class="queue-vis">
+    <span style="font-size:0.70rem;color:var(--gold);margin-right:6px">FRONT</span>
+    {% for case in queue_list %}
+    <div class="queue-item">
+      <div class="queue-box {% if loop.first %}front{% endif %}">
+        {{ case.case_id }}<br><span style="font-size:0.62rem;color:var(--text-muted)">{{ case.priority }}</span>
+      </div>
+      {% if not loop.last %}
+      <div class="queue-arrow">→</div>
+      {% endif %}
+    </div>
+    {% endfor %}
+    <div class="queue-arrow">→</div>
+    <div class="queue-null">NULL (REAR)</div>
+  </div>
+  {% else %}
+  <div class="queue-null" style="margin:8px 0">[ Queue is empty ]</div>
+  {% endif %}
+</div>
+
+<!-- 2. PRIORITY QUEUE -->
+<div class="dsa-panel">
+  <div class="dsa-panel-title">
+    ▲ 2. Priority Queue — Min-Heap
+    <span class="dsa-complexity">Push O(log n) · Pop O(log n) · Peek O(1)</span>
+  </div>
+  <p style="font-size:0.78rem;color:var(--text-muted);margin-bottom:12px">
+    Uses Python's <code>heapq</code>. Priority encoding: High=0, Medium=1, Low=2.
+    Ties broken by filing date. Implemented in <code>dsa/priority_queue.py</code>.
+  </p>
+  {% if pq_list %}
+  <div class="queue-vis">
+    <span style="font-size:0.70rem;color:var(--gold);margin-right:6px">TOP</span>
+    {% for case in pq_list %}
+    <div class="queue-item">
+      <div class="queue-box {% if loop.first %}front{% endif %}">
+        {{ case.case_id }}<br>
+        <span style="font-size:0.62rem">
+          {% if case.priority == 'High' %}<span style="color:#f87171">▲ High</span>
+          {% elif case.priority == 'Medium' %}<span style="color:#fbbf24">● Med</span>
+          {% else %}<span style="color:#4ade80">▼ Low</span>{% endif %}
+        </span>
+      </div>
+      {% if not loop.last %}
+      <div class="queue-arrow">→</div>
+      {% endif %}
+    </div>
+    {% endfor %}
+    <div class="queue-arrow">→</div>
+    <div class="queue-null">...</div>
+  </div>
+  {% else %}
+  <div class="queue-null" style="margin:8px 0">[ Priority Queue is empty ]</div>
+  {% endif %}
+</div>
+
+<!-- 3. STACK -->
+<div class="dsa-panel">
+  <div class="dsa-panel-title">
+    📚 3. Stack — LIFO (Last-In, First-Out)
+    <span class="dsa-complexity">Push O(1) · Pop O(1) · Peek O(1)</span>
+  </div>
+  <p style="font-size:0.78rem;color:var(--text-muted);margin-bottom:12px">
+    Completed cases are pushed onto this stack. Most recent verdict is on top.
+    Implemented in <code>dsa/stack.py</code>.
+  </p>
+  {% if stack_list %}
+  <div class="stack-vis">
+    {% for case in stack_list %}
+    <div class="stack-item">
+      <div class="stack-box {% if loop.first %}top{% endif %}">{{ case.case_id }} — {{ case.plaintiff }} vs {{ case.defendant }}</div>
+      <span class="stack-label">{% if loop.first %}← TOP{% endif %}</span>
+    </div>
+    {% endfor %}
+    <div style="font-size:0.70rem;color:var(--text-muted);margin-top:4px;font-family:'JetBrains Mono',monospace">⊥ BOTTOM</div>
+  </div>
+  {% else %}
+  <div class="queue-null" style="margin:8px 0">[ Stack is empty — no completed cases ]</div>
+  {% endif %}
+</div>
+
+<!-- 4. LINKED LIST -->
+<div class="dsa-panel">
+  <div class="dsa-panel-title">
+    🔗 4. Linked List — Case History Chains
+    <span class="dsa-complexity">Insert O(n) · Delete O(n) · Search O(n)</span>
+  </div>
+  <p style="font-size:0.78rem;color:var(--text-muted);margin-bottom:12px">
+    Each case has a singly linked list of history events.
+    Each node stores one action. The next pointer links to the next event.
+    Implemented in <code>dsa/linked_list.py</code>.
+  </p>
+  {% for case_id, entries in linked_lists.items() %}
+  {% if entries %}
+  <div style="margin-bottom:12px">
+    <p style="font-size:0.72rem;color:var(--gold);margin-bottom:6px">{{ case_id }}</p>
+    <div class="ll-chain">
+      {% for entry in entries %}
+      <div class="ll-node">
+        <div class="ll-data">
+          <span>{{ entry.action|truncate(20) }}</span>
+          <span style="font-size:0.60rem;color:var(--text-muted)">{{ entry.action_date }}</span>
+        </div>
+        <div class="ll-ptr">→</div>
+      </div>
+      <div class="ll-arrow">→</div>
+      {% endfor %}
+      <div class="ll-null">NULL</div>
+    </div>
+  </div>
+  {% endif %}
+  {% endfor %}
+</div>
+
+<!-- 5. DICTIONARY / HASH TABLE -->
+<div class="dsa-panel">
+  <div class="dsa-panel-title">
+    🔑 5. Dictionary / Hash Table — O(1) Case Lookup
+    <span class="dsa-complexity">Lookup O(1) avg</span>
+  </div>
+  <p style="font-size:0.78rem;color:var(--text-muted);margin-bottom:12px">
+    A Python <code>dict</code> maps Case ID → case data using a hash function internally.
+    Given any Case ID, the case is found in O(1) average time without scanning the list.
+  </p>
+  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:8px">
+    {% for case_id, case in case_dict.items() %}
+    <div style="background:rgba(59,130,246,0.07);border:1px solid rgba(59,130,246,0.20);border-radius:6px;padding:8px 12px">
+      <span class="mono" style="color:var(--gold);font-size:0.78rem">"{{ case_id }}"</span>
+      <span style="color:var(--text-muted);font-size:0.72rem"> → </span>
+      <span style="font-size:0.73rem;color:var(--text-secondary)">{ {{ case.plaintiff }} vs {{ case.defendant }} }</span>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+
+<!-- 6. SORTING -->
+<div class="dsa-panel">
+  <div class="dsa-panel-title">
+    🔃 6. Bubble Sort — Used in All Cases table
+    <span class="dsa-complexity">O(n²) avg · O(n) best</span>
+  </div>
+  <p style="font-size:0.78rem;color:var(--text-muted);margin-bottom:8px">
+    Bubble Sort repeatedly compares and swaps adjacent elements.
+    Used to sort the All Cases table by Case ID, Priority, or Filing Date.
+    Implemented in <code>dsa/sorting.py</code>.
+  </p>
+  <pre style="background:rgba(0,0,0,0.4);border-radius:6px;padding:12px;font-size:0.75rem;color:#a5b4fc;overflow-x:auto">for i in range(n):            # O(n) passes
+    for j in range(0, n-i-1): # O(n) comparisons per pass
+        if key(arr[j]) > key(arr[j+1]):
+            arr[j], arr[j+1] = arr[j+1], arr[j]  # swap
+    if not swapped: break     # O(n) best case</pre>
+</div>
+
+<!-- 7. SEARCHING -->
+<div class="dsa-panel">
+  <div class="dsa-panel-title">
+    🔍 7. Searching Algorithms
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin-top:4px">
+    <div style="background:rgba(6,8,18,0.6);border:1px solid rgba(255,255,255,0.07);border-radius:8px;padding:14px">
+      <p class="mono" style="color:var(--gold);font-size:0.78rem;margin-bottom:6px">Linear Search — O(n)</p>
+      <p style="font-size:0.73rem;color:var(--text-muted)">Scans every case one by one. Works on any list.</p>
+      <pre style="font-size:0.70rem;color:#a5b4fc;margin-top:8px">for case in cases:
+    if query in case[field]:
+        return case</pre>
+    </div>
+    <div style="background:rgba(6,8,18,0.6);border:1px solid rgba(255,255,255,0.07);border-radius:8px;padding:14px">
+      <p class="mono" style="color:var(--gold);font-size:0.78rem;margin-bottom:6px">Binary Search — O(log n)</p>
+      <p style="font-size:0.73rem;color:var(--text-muted)">Sorted list; halves search range each step.</p>
+      <pre style="font-size:0.70rem;color:#a5b4fc;margin-top:8px">low, high = 0, n-1
+while low <= high:
+    mid = (low+high)//2
+    if arr[mid] == target: return</pre>
+    </div>
+    <div style="background:rgba(6,8,18,0.6);border:1px solid rgba(255,255,255,0.07);border-radius:8px;padding:14px">
+      <p class="mono" style="color:var(--gold);font-size:0.78rem;margin-bottom:6px">Hash Lookup — O(1) avg</p>
+      <p style="font-size:0.73rem;color:var(--text-muted)">Python dict. Direct key access via hash function.</p>
+      <pre style="font-size:0.70rem;color:#a5b4fc;margin-top:8px">case_dict = {c['case_id']: c
+             for c in all_cases}
+result = case_dict.get(query)</pre>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
